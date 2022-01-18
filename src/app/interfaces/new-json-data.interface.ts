@@ -8,7 +8,7 @@ export interface NewJsonFormData {
   navigation?: string;
   submitId?: string;
   groups?: GroupDetails[];
-  // rootGroup: FormGroup;
+  controlGroups: FormGroup;
 }
 
 export interface GroupDetails {

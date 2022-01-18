@@ -9,7 +9,6 @@ import {
 import { MetaDataApiService } from './meta-data-api.service';
 import {
   Component,
-  Group,
   JsonFormData,
 } from 'src/app/interfaces/json-data.interface';
 
@@ -56,6 +55,7 @@ export class JsonFormParserService {
       navigation: formOptions.FP_Navigation,
       submitId: formOptions.Submit_ID,
       groups: this.transformGroup(Groups),
+      controlGroups: this.rootGroup,
     };
   }
 
@@ -72,7 +72,6 @@ export class JsonFormParserService {
         label: groupOptions.Group_Display,
         htmlControls: this.transformHtmlControl(Component),
       });
-      //allGroups.push(groupDetails);
     }
     return allGroups;
   }
@@ -98,25 +97,22 @@ export class JsonFormParserService {
         styles: this.addStyleProperties(component),
         validators: this.addValidatorProperties(component),
       };
+
       htmlControls.push(control);
       formControlArray.push(this.createFormControl(control));
     }
     this.groupsArray.push(this.formBuilder.group(formControlArray));
+
     return htmlControls;
   }
 
   processJsonForm(
     useLocalJson?: boolean,
     params?: {}
-  ): Observable<[NewJsonFormData, FormGroup]> {
+  ): Observable<NewJsonFormData> {
     return this.metaApi
       .getMetaData(useLocalJson, params)
-      .pipe(
-        map((response: JsonFormData) => [
-          this.transJsonFormData(response),
-          this.rootGroup,
-        ])
-      );
+      .pipe(map((response: JsonFormData) => this.transJsonFormData(response)));
   }
 
   private createFormControl(component: HtmlControl) {
