@@ -1,25 +1,9 @@
 import { Injectable } from '@angular/core';
-import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
-import { MetaDataApiService } from './meta-data-api.service';
-import {
-  Component,
-  JsonFormData,
-} from 'src/app/interfaces/json-data.interface';
-
-import {
-  HtmlControl,
-  GroupDetails,
-  NewJsonFormData,
-  HtmlControlStyles,
-  HtmlControlValidators,
-} from 'src/app/interfaces/new-json-data.interface';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { map, Observable } from 'rxjs';
+import { Component, JsonFormData } from 'src/app/interfaces/json-data.interface';
+import { GroupDetails, HtmlControl, HtmlControlStyles, HtmlControlValidators, NewJsonFormData } from 'src/app/interfaces/new-json-data.interface';
+import { MetaDataApiService } from './meta-data-api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -27,10 +11,7 @@ import { map, Observable } from 'rxjs';
 export class JsonFormParserService {
   private rootGroup!: FormGroup;
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private metaApi: MetaDataApiService
-  ) {
+  constructor(private formBuilder: FormBuilder, private metaApi: MetaDataApiService) {
     this.initForm();
   }
 
@@ -46,17 +27,18 @@ export class JsonFormParserService {
 
   private transJsonFormData(rawData: JsonFormData): NewJsonFormData {
     let { Groups, ...formOptions } = rawData;
-    return {
+    let jsonFormData:NewJsonFormData = {
       formId: formOptions.FP_ID,
       formName: formOptions.FP_Name,
       title: formOptions.FP_Title,
       type: formOptions.FP_Type,
       showHeader: formOptions.Form_Header == 'Y' ? true : false,
       navigation: formOptions.FP_Navigation,
-      submitId: formOptions.Submit_ID,
-      groups: this.transformGroup(Groups),
-      controlGroups: this.rootGroup,
+      submitId: formOptions.Submit_ID,      
     };
+    jsonFormData.groups= this.transformGroup(Groups);
+    jsonFormData.formGroups= this.rootGroup;
+    return jsonFormData;
   }
 
   private transformGroup(Groups: any): GroupDetails[] {
@@ -70,38 +52,41 @@ export class JsonFormParserService {
         visible: groupOptions.IS_Visible == 1 ? true : false,
         groupLabeling: groupOptions.Group_Labelling == 'Y' ? true : false,
         label: groupOptions.Group_Display,
+
         htmlControls: this.transformHtmlControl(Component),
+
       });
     }
     return allGroups;
   }
 
-  private transformHtmlControl(Components: Component[]): HtmlControl[] {
+  private transformHtmlControl(Components: Component[], controlsGroup: FormGroup): HtmlControl[] {
     let htmlControls: HtmlControl[] = [];
+
     let formControlArray: FormControl[] = [];
 
     for (let component of Components) {
-      let control: HtmlControl = {
-        name: component.Component_Label,
-        type: component.Component_Type,
-        labeling: component.Labelling == 'Y' ? true : false,
-        label: component.Label_Display_name,
-        value: [component.component_value],
-        group_mapping_id: component.group_component_mapping_ID,
-        options: [
+      let control: HtmlControl = {};
+      (control.name = component.Component_Label),
+        (control.type = component.Component_Type),
+        (control.labeling = component.Labelling == 'Y' ? true : false),
+        (control.label = component.Label_Display_name),
+        (control.value = [component.component_value]),
+        (control.group_mapping_id = component.group_component_mapping_ID),
+        (control.options = [
           {
             controlOptionKey: 'placeholder',
             controlOptionValue: component.Component_Help_Text,
           },
-        ],
-        styles: this.addStyleProperties(component),
-        validators: this.addValidatorProperties(component),
-      };
+        ]),
+        (control.styles = this.addStyleProperties(component)),
+        (control.validators = this.addValidatorProperties(component)),
+        (control.formControl = this.createFormControl(control)),
+        htmlControls.push(control);
 
-      htmlControls.push(control);
-      formControlArray.push(this.createFormControl(control));
+      formControlArray.push(control.formControl);
     }
-    this.groupsArray.push(this.formBuilder.group(formControlArray));
+    controlsGroup.(this.formBuilder.group(formControlArray));
 
     return htmlControls;
   }
@@ -116,6 +101,12 @@ export class JsonFormParserService {
   }
 
   private createFormControl(component: HtmlControl) {
+    let validators = [];
+    validators = this.addValidatorClasses(component.validators);
+    return this.formBuilder.control(component.value, validators);
+  }
+
+  private createFormControl2(component: HtmlControl) {
     let validators = [];
     validators = this.addValidatorClasses(component.validators);
     return this.formBuilder.control(component.value, validators);

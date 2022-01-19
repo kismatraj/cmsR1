@@ -1,6 +1,5 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { map } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { NewJsonFormData } from 'src/app/interfaces/new-json-data.interface';
 import { JsonFormParserService } from '../services/json-form-parser.service';
 
@@ -12,16 +11,15 @@ import { JsonFormParserService } from '../services/json-form-parser.service';
 export class JsonFormComponent implements OnInit {
   @Input('useLocalJson') useLocalJson!: boolean;
   @Input('param') param!: {};
-  rootGroup!: FormGroup;
-  jsonFormData!: NewJsonFormData;
+  formData$!: Observable<NewJsonFormData>;
 
   constructor(private jsonParser: JsonFormParserService) {}
+
   ngOnChanges(changes: SimpleChanges): void {
-    this.jsonParser
-      .processJsonForm(this.useLocalJson, this.param)
-      .subscribe((data) => {
-        console.log(data);
-      });
+    this.formData$ = this.jsonParser.processJsonForm(
+      this.useLocalJson,
+      this.param
+    );
   }
   ngOnInit(): void {}
 }

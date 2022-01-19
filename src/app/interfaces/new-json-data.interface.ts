@@ -1,4 +1,4 @@
-import { FormGroup } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 export interface NewJsonFormData {
   formId: number;
   formName: string;
@@ -8,7 +8,7 @@ export interface NewJsonFormData {
   navigation?: string;
   submitId?: string;
   groups?: GroupDetails[];
-  controlGroups: FormGroup;
+  formGroups?: FormGroup;
 }
 
 export interface GroupDetails {
@@ -19,6 +19,7 @@ export interface GroupDetails {
   visible?: boolean;
   groupLabeling?: boolean;
   label?: string;
+  controlsGroup?: FormGroup;
   htmlControls?: HtmlControl[];
 }
 
@@ -29,6 +30,7 @@ export interface HtmlControl {
   label?: string;
   value?: string[];
   group_mapping_id?: number;
+  formControl?: FormControl;
   options?: HtmlControlOptions[];
   styles?: HtmlControlStyles[];
   validators?: HtmlControlValidators[];
