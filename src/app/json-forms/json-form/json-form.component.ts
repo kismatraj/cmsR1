@@ -17,13 +17,11 @@ export class JsonFormComponent implements OnInit {
 
   constructor(private jsonParser: JsonFormParserService) {}
   ngOnChanges(changes: SimpleChanges): void {
-    this.jsonParser.processJsonForm(this.useLocalJson, this.param).pipe(
-      map((data) => {
-        // this.jsonFormData = data[0];
-        // this.rootGroup = data[1];
-        console.log(data[0]);
-      })
-    );
+    this.jsonParser
+      .processJsonForm(this.useLocalJson, this.param)
+      .subscribe((data) => {
+        console.log(data);
+      });
   }
   ngOnInit(): void {}
 }
