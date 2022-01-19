@@ -1,11 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { map, Observable } from 'rxjs';
 import {
   Component,
@@ -68,10 +62,10 @@ export class JsonFormParserService {
         label: groupOptions.Group_Display,
       };
       let htmlConDetails = this.transformHtmlControls(Component);
-      grp.controlsGroup = htmlConDetails[0];
+      grp.groupControls = htmlConDetails[0];
       grp.htmlControls = htmlConDetails[1];
       allGroups.push(grp);
-      formGroupArray.push(grp.controlsGroup);
+      formGroupArray.push(grp.groupControls);
     }
     return [formGroupArray, allGroups];
   }
@@ -100,7 +94,7 @@ export class JsonFormParserService {
         validators: this.addValidatorProperties(component),
       };
       control.formControl = this.createFormControl(control);
-      controlsGroup = this.formBuilder.group(control.formControl);
+      controlsGroup.registerControl(control.name ?? '', control.formControl);
       htmlControls.push(control);
     }
     return [controlsGroup, htmlControls];
@@ -116,12 +110,6 @@ export class JsonFormParserService {
   }
 
   private createFormControl(component: HtmlControl) {
-    let validators = [];
-    validators = this.addValidatorClasses(component.validators);
-    return this.formBuilder.control(component.value, validators);
-  }
-
-  private createFormControl2(component: HtmlControl) {
     let validators = [];
     validators = this.addValidatorClasses(component.validators);
     return this.formBuilder.control(component.value, validators);

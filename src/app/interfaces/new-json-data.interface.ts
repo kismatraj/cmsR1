@@ -19,7 +19,7 @@ export interface GroupDetails {
   visible?: boolean;
   groupLabeling?: boolean;
   label?: string;
-  controlsGroup?: FormGroup;
+  groupControls?: FormGroup;
   htmlControls?: HtmlControl[];
 }
 

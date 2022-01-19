@@ -12,6 +12,7 @@ export class JsonFormComponent implements OnInit {
   @Input('useLocalJson') useLocalJson!: boolean;
   @Input('param') param!: {};
   formData$!: Observable<NewJsonFormData>;
+  jsonFormData!: NewJsonFormData;
 
   constructor(private jsonParser: JsonFormParserService) {}
 
@@ -21,7 +22,7 @@ export class JsonFormComponent implements OnInit {
       this.param
     );
     this.formData$.subscribe((data) => {
-      console.log(data);
+      this.jsonFormData = data;
     });
   }
   ngOnInit(): void {}
