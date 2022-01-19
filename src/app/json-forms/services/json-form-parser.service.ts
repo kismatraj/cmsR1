@@ -22,7 +22,7 @@ export class JsonFormParserService {
   }
 
   get groupsArray(): FormArray {
-    return this.rootGroup.get('groupsArray') as FormArray;
+   j return this.rootGroup.get('groupsArray') as FormArray;
   }
 
   private transJsonFormData(rawData: JsonFormData): NewJsonFormData {
