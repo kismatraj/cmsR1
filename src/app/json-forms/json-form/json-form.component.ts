@@ -20,6 +20,9 @@ export class JsonFormComponent implements OnInit {
       this.useLocalJson,
       this.param
     );
+    this.formData$.subscribe((data) => {
+      console.log(data);
+    });
   }
   ngOnInit(): void {}
 }
